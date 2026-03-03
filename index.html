@@ -111,17 +111,26 @@
     }
 
     // Carregar dados ao abrir
-    window.onload = () => {
-        const memoria = JSON.parse(localStorage.getItem('campanha_data_v4') || '{}');
-        
-        document.querySelectorAll('.input-dia').forEach(input => {
-            if (memoria[input.dataset.id]) input.value = memoria[input.dataset.id];
-        });
+   window.onload = () => {
 
-        if (memoria.valorAvulso) document.getElementById('valor-avulso').value = memoria.valorAvulso;
+    const memoria = JSON.parse(
+        localStorage.getItem('campanha_data_v4') || '{}'
+    );
 
-        calcular();
-    };
+    document.querySelectorAll('.input-dia').forEach(input => {
+
+        if (memoria.hasOwnProperty(input.dataset.id)) {
+            input.value = memoria[input.dataset.id];
+        }
+
+    });
+
+    if (memoria.hasOwnProperty('valorAvulso')) {
+        document.getElementById('valor-avulso').value = memoria.valorAvulso;
+    }
+
+    calcular();
+};
 
     function limparTudo() {
         if (confirm("Deseja apagar todos os valores salvos?")) {
