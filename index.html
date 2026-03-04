@@ -3,138 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle de Doações</title>
+    <title>Controle de Doações - Campanha 2026</title>
     <style>
-        body { font-family: 'Courier New', monospace; background: #f0f2f5; display: flex; flex-direction: column; align-items: center; padding: 20px; }
-        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 500px; }
-        h2 { text-align: center; color: #333; margin-bottom: 10px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; padding: 10px; display: flex; flex-direction: column; align-items: center; }
         
-        .tabela-dias { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        .tabela-dias th { background: #333; color: white; padding: 10px; position: sticky; top: 0; }
-        .tabela-dias td { padding: 5px; border-bottom: 1px solid #eee; }
-        .dia-label { font-weight: bold; width: 100px; }
-        input[type="number"] { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; text-align: right; box-sizing: border-box; }
-        input:focus { background: #fffde0; outline: none; border-color: #333; }
+        /* Estilo da Tela de Bloqueio */
+        #tela-login { 
+            background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            text-align: center; margin-top: 50px; width: 100%; max-width: 300px;
+        }
+        #pin-input { width: 100%; padding: 10px; font-size: 20px; text-align: center; margin-top: 10px; border: 2px solid #ddd; border-radius: 4px; }
+        
+        /* Conteúdo Principal (Escondido inicialmente) */
+        #conteudo-principal { display: none; width: 100%; max-width: 800px; }
+        
+        .container { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; }
+        h2 { text-align: center; color: #333; margin: 0 0 15px 0; font-size: 1.2em; }
+        
+        .grid-dias { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
+            gap: 8px; max-height: 450px; overflow-y: auto; padding: 5px;
+            border: 1px solid #eee; margin-bottom: 15px;
+        }
+        
+        .dia-item { display: flex; align-items: center; background: #fff; padding: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        .dia-label { font-size: 12px; font-weight: bold; width: 60px; color: #555; }
+        
+        input[type="number"] { width: 100%; padding: 5px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-size: 13px; }
+        input:focus { background: #fffde0; outline: none; border-color: #28a745; }
 
-        .resumo { background: #e9ecef; padding: 15px; border-radius: 6px; font-weight: bold; font-size: 14px; line-height: 1.6; }
-        .resumo div { display: flex; justify-content: space-between; border-bottom: 1px dashed #ccc; padding: 5px 0; }
-        .destaque-64 { color: #28a745; }
-        
-        .btn-limpar { margin-top: 15px; background: none; border: none; color: #dc3545; cursor: pointer; text-decoration: underline; font-size: 12px; }
-        .scroll-area { max-height: 400px; overflow-y: auto; border: 1px solid #eee; margin-bottom: 10px; }
+        .painel-valores { background: #343a40; color: white; padding: 15px; border-radius: 6px; }
+        .linha-principal { display: flex; justify-content: space-between; font-size: 16px; border-bottom: 1px solid #555; padding-bottom: 10px; margin-bottom: 10px; }
+        .destaque-valor { color: #4ade80; font-weight: bold; }
+
+        .simulacao-box { background: #454d55; padding: 10px; border-radius: 4px; }
+        .simulacao-input-group { display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+        .resultado-simulado { font-size: 18px; color: #ffc107; text-align: right; display: block; }
+
+        .acoes { margin-top: 15px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .btn { padding: 8px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .btn-export { background: #007bff; color: white; }
+        .btn-import { background: #6c757d; color: white; }
+        .btn-limpar { background: #dc3545; color: white; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>Campanha 2026</h2>
-    
-    <div class="scroll-area">
-        <table class="tabela-dias">
-            <thead>
-                <tr>
-                    <th>Mês/Dia</th>
-                    <th>Valor (R$)</th>
-                </tr>
-            </thead>
-            <tbody id="corpo-tabela">
-                </tbody>
-        </table>
-    </div>
+<div id="tela-login">
+    <h3>Acesso Restrito</h3>
+    <p>Digite o PIN para acessar:</p>
+    <input type="password" id="pin-input" maxlength="4" placeholder="****" oninput="verificarPIN()">
+</div>
 
-    <div class="resumo">
-        <div>
-            <span>SOMA DIAS:</span>
-            <span>R$ <span id="soma-dias">0,00</span> | <span class="destaque-64">64%: <span id="soma-64">0,00</span></span></span>
+<div id="conteudo-principal">
+    <div class="container">
+        <h2>Campanha 2026</h2>
+        
+        <div class="grid-dias" id="grid-dias"></div>
+
+        <div class="painel-valores">
+            <div class="linha-principal">
+                <span>SOMA: <span class="destaque-valor" id="soma-total">R$ 0,00</span></span>
+                <span>FIXO 63%: <span class="destaque-valor" id="valor-63">R$ 0,00</span></span>
+            </div>
+
+            <div class="simulacao-box">
+                <div class="simulacao-input-group">
+                    <span>SIMULAÇÃO (%):</span>
+                    <input type="number" id="porcentagem-simular" value="64" oninput="calcular()" style="width: 70px; background: white; color: black;">
+                </div>
+                <div style="text-align: right; font-size: 12px; color: #ccc;">RESULTADO SIMULADO:</div>
+                <div class="resultado-simulado" id="resultado-simulado">R$ 0,00</div>
+            </div>
         </div>
-        <div style="margin-top: 10px; border-top: 2px solid #333;">
-            <span>VALOR LANÇADO REAL:</span>
-            <input type="number" id="valor-avulso" placeholder="0.00" style="width: 120px;" oninput="calcular()">
-        </div>
-        <div>
-            <span>RESULTADO REAL:</span>
-            <span>R$ <span id="real-exibido">0,00</span> | <span class="destaque-64">64%: <span id="real-64">0,00</span></span></span>
+
+        <div class="acoes">
+            <button class="btn btn-export" onclick="exportarBackup()">Exportar Backup</button>
+            <button class="btn btn-import" onclick="importarBackup()">Importar Backup</button>
+            <button class="btn btn-limpar" onclick="limparTudo()">Limpar Tudo</button>
         </div>
     </div>
-
-    <button class="btn-limpar" onclick="limparTudo()">Limpar todos os dados</button>
 </div>
 
 <script>
-    const corpoTabela = document.getElementById('corpo-tabela');
-    const meses = [
-        { nome: 'Fevereiro', dias: 28 },
-        { nome: 'Março', dias: 31 }
-    ];
+    // PIN de acesso
+    const PIN_CORRETO = "3333";
 
-    // Gerar a tabela
-    meses.forEach(mes => {
-        for (let i = 1; i <= mes.dias; i++) {
-            let diaFormatado = i.toString().padStart(2, '0');
-            let id = `${mes.nome.toLowerCase()}_${diaFormatado}`;
-            
-            let row = `<tr>
-                <td class="dia-label">${mes.nome.substring(0,3)} ${diaFormatado}</td>
-                <td><input type="number" step="0.01" class="input-dia" data-id="${id}" oninput="calcular()"></td>
-            </tr>`;
-            corpoTabela.innerHTML += row;
+    // Dados das fotos
+    const dadosIniciais = {
+        "fev_09":"314.44", "fev_10":"384.00", "fev_11":"655.50", "fev_12":"555.00", "fev_13":"110.27", "fev_14":"144.00", "fev_15":"285.14", "fev_16":"9.02",
+        "fev_17":"0.00", "fev_18":"82.00", "fev_19":"685.00", "fev_20":"50.00", "fev_21":"20.00", "fev_22":"20.00", "fev_23":"10.00", "fev_24":"150.00",
+        "fev_25":"70.00", "fev_26":"205.00", "fev_27":"243.00", "fev_28":"25.00", "mar_03":"56.00", "mar_04":"120.00"
+    };
+
+    function verificarPIN() {
+        const input = document.getElementById('pin-input');
+        if (input.value === PIN_CORRETO) {
+            document.getElementById('tela-login').style.display = 'none';
+            document.getElementById('conteudo-principal').style.display = 'block';
+            inicializarTabela();
         }
-    });
+    }
 
-    // Função de Cálculo e Memória
-    function calcular() {
-        let somaTotalDias = 0;
-        let dadosParaSalvar = {};
+    function inicializarTabela() {
+        const grid = document.getElementById('grid-dias');
+        grid.innerHTML = ""; // Limpa para não duplicar
 
-        // Coleta valores dos dias
+        // Gerar Fev (09-28) e Mar (01-31)
+        for (let i = 9; i <= 28; i++) criarItem('Fev', i);
+        for (let i = 1; i <= 31; i++) criarItem('Mar', i);
+
+        // Carregar memória do navegador
+        const memoria = JSON.parse(localStorage.getItem('campanha_2026_v6') || '{}');
+        
         document.querySelectorAll('.input-dia').forEach(input => {
-            let valor = parseFloat(input.value) || 0;
-            somaTotalDias += valor;
-            if (input.value) dadosParaSalvar[input.dataset.id] = input.value;
+            const id = input.dataset.id;
+            // Prioriza o que o usuário já salvou no navegador, senão usa os dados das fotos
+            if (memoria[id] !== undefined) {
+                input.value = memoria[id];
+            } else if (dadosIniciais[id]) {
+                input.value = dadosIniciais[id];
+            }
+        });
+        calcular();
+    }
+
+    function criarItem(mes, dia) {
+        let diaFmt = dia.toString().padStart(2, '0');
+        let id = `${mes.toLowerCase()}_${diaFmt}`;
+        document.getElementById('grid-dias').innerHTML += `
+            <div class="dia-item">
+                <span class="dia-label">${mes} ${diaFmt}</span>
+                <input type="number" step="0.01" class="input-dia" data-id="${id}" oninput="calcular()">
+            </div>`;
+    }
+
+    function calcular() {
+        let total = 0;
+        let dadosParaSalvar = {};
+        document.querySelectorAll('.input-dia').forEach(input => {
+            let v = parseFloat(input.value) || 0;
+            total += v;
+            if(input.value) dadosParaSalvar[input.dataset.id] = input.value;
         });
 
-        // Valor Avulso (Lançado)
-        let valorAvulso = parseFloat(document.getElementById('valor-avulso').value) || 0;
-        dadosParaSalvar['valorAvulso'] = valorAvulso;
-
-        // Salva no LocalStorage
-        localStorage.setItem('campanha_data_v4', JSON.stringify(dadosParaSalvar));
-
-        // Atualiza a tela
+        localStorage.setItem('campanha_2026_v6', JSON.stringify(dadosParaSalvar));
         const f = (v) => v.toLocaleString('pt-br', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-        document.getElementById('soma-dias').innerText = f(somaTotalDias);
-        document.getElementById('soma-64').innerText = f(somaTotalDias * 0.64);
+        document.getElementById('soma-total').innerText = "R$ " + f(total);
+        document.getElementById('valor-63').innerText = "R$ " + f(total * 0.63);
         
-        document.getElementById('real-exibido').innerText = f(valorAvulso);
-        document.getElementById('real-64').innerText = f(valorAvulso * 0.64);
+        let porc = parseFloat(document.getElementById('porcentagem-simular').value) || 0;
+        document.getElementById('resultado-simulado').innerText = "R$ " + f(total * (porc / 100));
     }
 
-    // Carregar dados ao abrir
-   window.onload = () => {
-
-    const memoria = JSON.parse(
-        localStorage.getItem('campanha_data_v4') || '{}'
-    );
-
-    document.querySelectorAll('.input-dia').forEach(input => {
-
-        if (memoria.hasOwnProperty(input.dataset.id)) {
-            input.value = memoria[input.dataset.id];
-        }
-
-    });
-
-    if (memoria.hasOwnProperty('valorAvulso')) {
-        document.getElementById('valor-avulso').value = memoria.valorAvulso;
+    function exportarBackup() {
+        const dados = localStorage.getItem('campanha_2026_v6');
+        if (!dados) return alert("Não há dados salvos.");
+        const blob = new Blob([dados], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'backup_campanha.txt';
+        a.click();
     }
 
-    calcular();
-};
+    function importarBackup() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.onchange = e => {
+            const reader = new FileReader();
+            reader.onload = ev => {
+                localStorage.setItem('campanha_2026_v6', ev.target.result);
+                location.reload();
+            };
+            reader.readAsText(e.target.files[0]);
+        };
+        input.click();
+    }
 
     function limparTudo() {
-        if (confirm("Deseja apagar todos os valores salvos?")) {
-            localStorage.removeItem('campanha_data_v4');
+        if (confirm("Apagar tudo?")) {
+            localStorage.removeItem('campanha_2026_v6');
             location.reload();
         }
     }
